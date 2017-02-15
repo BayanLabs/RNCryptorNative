@@ -13,9 +13,9 @@ using CryptoPP::StringSink;
 using CryptoPP::StringSource;
 
 
-string RNDecryptor::decrypt(string encryptedBase64, string password)
+string RNDecryptor::decrypt(string encryptedData, string password)
 {
-	RNCryptorPayloadComponents components = this->unpackEncryptedBase64Data(encryptedBase64);
+	RNCryptorPayloadComponents components = this->unpackEncryptedData(encryptedData);
 
 	if (!this->hmacIsValid(components, password)) {
 		return "";
@@ -23,7 +23,6 @@ string RNDecryptor::decrypt(string encryptedBase64, string password)
 
 	SecByteBlock key = this->generateKey(components.salt, password);
 
-	string encrypted = components.ciphertext;
 	string plaintext = "";
 
 	switch (this->aesMode) {
@@ -59,9 +58,9 @@ string RNDecryptor::decrypt(string encryptedBase64, string password)
 	return plaintext;
 }
 
-RNCryptorPayloadComponents RNDecryptor::unpackEncryptedBase64Data(string encryptedBase64)
+RNCryptorPayloadComponents RNDecryptor::unpackEncryptedData(string encryptedData)
 {
-	string binaryData = RNCryptor::base64_decode(encryptedBase64);
+	string binaryData = encryptedData;
 
 	RNCryptorPayloadComponents components;
 	int offset = 0;

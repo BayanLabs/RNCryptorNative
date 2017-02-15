@@ -20,7 +20,7 @@ using CryptoPP::StreamTransformationFilter;
 using CryptoPP::StringSink;
 using CryptoPP::StringSource;
 
-string RNEncryptor::encrypt(string plaintext, string password, RNCryptorSchema schemaVersion)
+string RNEncryptor::encrypt(string data, string password, RNCryptorSchema schemaVersion)
 {
 	this->configureSettings(schemaVersion);
 
@@ -39,7 +39,7 @@ string RNEncryptor::encrypt(string plaintext, string password, RNCryptorSchema s
 			CTR_Mode<AES>::Encryption encryptor;
 			encryptor.SetKeyWithIV((const byte *)key.data(), key.size(), (const byte *)components.iv.data());
 
-			StringSource(plaintext, true,
+			StringSource(data, true,
 				// StreamTransformationFilter adds padding as required.
 				new StreamTransformationFilter(encryptor,
 					new StringSink(components.ciphertext)
@@ -53,7 +53,7 @@ string RNEncryptor::encrypt(string plaintext, string password, RNCryptorSchema s
 			CBC_Mode<AES>::Encryption encryptor;
 			encryptor.SetKeyWithIV(key.BytePtr(), key.size(), (const byte *)components.iv.data());
 
-			StringSource(plaintext, true,
+			StringSource(data, true,
 				// StreamTransformationFilter adds padding as required.
 				new StreamTransformationFilter(encryptor,
 					new StringSink(components.ciphertext)
@@ -76,7 +76,7 @@ string RNEncryptor::encrypt(string plaintext, string password, RNCryptorSchema s
 
 	binaryData << this->generateHmac(components, password);
 
-	return this->base64_encode(binaryData.str());
+	return binaryData.str();
 }
 
 string RNEncryptor::generateSalt()

@@ -69,35 +69,43 @@ Java_tgio_rncryptor_RNCryptorNative_getABI(JNIEnv *env, jobject thiz) {
     return (env)->NewStringUTF(ABI);
 }
 
-jbyteArray Java_tgio_rncryptor_RNCryptorNative_encrypt(JNIEnv *env, jobject instance, jstring raw_, jstring password_) {
-    const char *raw = env->GetStringUTFChars(raw_, 0);
+jbyteArray Java_tgio_rncryptor_RNCryptorNative_encrypt(JNIEnv *env, jobject instance, jbyteArray raw_, jstring password_) {
+    jbyte* raw = env->GetByteArrayElements(raw_, NULL);
+    jsize raw_size = env->GetArrayLength(raw_);
+    string data((const char*)raw, raw_size);
+
     const char *password = env->GetStringUTFChars(password_, 0);
     RNEncryptor *encryptor = new RNEncryptor();
-    string encryptedB64 = encryptor->encrypt(raw, password);
+    string encrypted = encryptor->encrypt(data, password);
     delete encryptor;
-    env->ReleaseStringUTFChars(raw_, raw);
+    env->ReleaseByteArrayElements(raw_, raw, JNI_ABORT);
     env->ReleaseStringUTFChars(password_, password);
-    jbyteArray array = env->NewByteArray(encryptedB64.size());
-    env->SetByteArrayRegion(array, 0, encryptedB64.size(), (const jbyte *) encryptedB64.c_str());
+    jbyteArray array = env->NewByteArray(encrypted.size());
+    env->SetByteArrayRegion(array, 0, encrypted.size(), (const jbyte *) encrypted.c_str());
 
     return array;
 }
 
 
-jstring Java_tgio_rncryptor_RNCryptorNative_decrypt(JNIEnv *env, jobject instance, jstring encrypted_, jstring password_) {
+jbyteArray Java_tgio_rncryptor_RNCryptorNative_decrypt(JNIEnv *env, jobject instance, jbyteArray encrypted_, jstring password_) {
     string decrypted = "0";
     if (encrypted_ != NULL) {
         try {
-            const char *encrypted = env->GetStringUTFChars(encrypted_, 0);
+            jbyte* encrypted = env->GetByteArrayElements(encrypted_, NULL);
+            jsize encrypted_size = env->GetArrayLength(encrypted_);
+            string encrypted_data((const char*)encrypted, encrypted_size);
+
             const char *password = env->GetStringUTFChars(password_, 0);
             RNDecryptor *cryptor = new RNDecryptor();
-            decrypted = cryptor->decrypt(encrypted, password);
+            decrypted = cryptor->decrypt(encrypted_data, password);
             delete cryptor;
-            env->ReleaseStringUTFChars(encrypted_, encrypted);
+            env->ReleaseByteArrayElements(encrypted_, encrypted, JNI_ABORT);
             env->ReleaseStringUTFChars(password_, password);
         } catch (exception e) {
             decrypted = "error decrypting";
         }
     }
-    return env->NewStringUTF(decrypted.c_str());
+    jbyteArray array = env->NewByteArray(decrypted.size());
+    env->SetByteArrayRegion(array, 0, decrypted.size(), (const jbyte *) decrypted.c_str());
+    return array;
 }

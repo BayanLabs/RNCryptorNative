@@ -8,11 +8,11 @@ using std::string;
 
 class RNDecryptor : public RNCryptor {
 
-	RNCryptorPayloadComponents unpackEncryptedBase64Data(string encryptedBase64);
+	RNCryptorPayloadComponents unpackEncryptedData(string encryptedData);
 	bool hmacIsValid(RNCryptorPayloadComponents components, string password);
 
 	public:
-		string decrypt(string encryptedBase64, string password);
+		string decrypt(string encryptedData, string password);
 };
 
 #endif

@@ -1,7 +1,5 @@
 package tgio.rncryptor;
 
-import android.util.Base64;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -39,54 +37,20 @@ public class RNCryptorNative {
     public native String getABI();
 
     /**
-     * Encrypts raw string.
-     * @param raw just a raw string
+     * Encrypts raw binary data.
+     * @param raw just raw binary data
      * @param password strong generated password
-     * @return base64 byte array of encryteped string
+     * @return encrypted data
      */
-    public native byte[] encrypt(String raw, String password);
+    public native byte[] encrypt(byte[] raw, String password);
 
     /**
-     * Decrypts base64 string.
-     * @param encrypted base64 string
+     * Decrypts encrypted binary data.
+     * @param encrypted encrypted binary data
      * @param password strong generated password
-     * @return decrypted raw string
+     * @return decrypted raw data
      */
-    public native String decrypt(String encrypted, String password);
-
-
-    /**
-     * Decrypts encrypted base64 string and returns via callback
-     * @param encrypted base64 string
-     * @param password strong generated password
-     * @param RNCryptorNativeCallback just a callback
-     */
-    public static void decryptAsync(String encrypted, String password, RNCryptorNativeCallback RNCryptorNativeCallback) {
-        String decrypted;
-        try {
-            decrypted = new RNCryptorNative().decrypt(encrypted, password);
-            RNCryptorNativeCallback.done(decrypted, null);
-        } catch (Exception e) {
-            RNCryptorNativeCallback.done(null, e);
-        }
-    }
-
-    /**
-     * Encrypts raw string and returns result via callback
-     * @param raw just a raw string
-     * @param password strong generated password
-     * @param RNCryptorNativeCallback just a callback
-     */
-    public static void encryptAsync(String raw, String password, RNCryptorNativeCallback RNCryptorNativeCallback) {
-        byte[] encrypted;
-        try {
-            encrypted = new RNCryptorNative().encrypt(raw, password);
-            RNCryptorNativeCallback.done(new String(encrypted, "UTF-8"), null);
-        } catch (Exception e) {
-            RNCryptorNativeCallback.done(null, e);
-        }
-
-    }
+    public native byte[] decrypt(byte[] encrypted, String password);
 
     /**
      * Encrypts file using password
@@ -96,9 +60,8 @@ public class RNCryptorNative {
      * @throws IOException
      */
     public static void encryptFile(File raw, File encryptedFile, String password) throws IOException {
-        byte[] b = readBytes(raw);
-        String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
-        byte[] encryptedBytes = new RNCryptorNative().encrypt(encodedImage, password);
+        byte[] data = readBytes(raw);
+        byte[] encryptedBytes = new RNCryptorNative().encrypt(data, password);
         writeBytes(encryptedFile, encryptedBytes);
     }
 
@@ -110,10 +73,9 @@ public class RNCryptorNative {
      * @throws IOException
      */
     public static void decryptFile(File encryptedFile, File result, String password) throws IOException {
-        byte[] b = readBytes(encryptedFile);
-        String decryptedImageString = new RNCryptorNative().decrypt(new String(b), password);
-        byte[] decodedBytes = Base64.decode(decryptedImageString, 0);
-        writeBytes(result, decodedBytes);
+        byte[] data = readBytes(encryptedFile);
+        byte[] decryptedData = new RNCryptorNative().decrypt(data, password);
+        writeBytes(result, decryptedData);
     }
 
 
@@ -139,9 +101,5 @@ public class RNCryptorNative {
         bos.write(bytes);
         bos.flush();
         bos.close();
-    }
-
-    public interface RNCryptorNativeCallback {
-        void done(String result, Exception e);
     }
 }

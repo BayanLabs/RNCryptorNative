@@ -27,7 +27,7 @@ enum RNCryptorAlgorithm {
 };
 
 enum RNCryptorSchema {
-	SCHEMA_0, SCHEMA_1, SCHEMA_2
+	SCHEMA_0, SCHEMA_1, SCHEMA_2, SCHEMA_3
 };
 
 enum RNCryptorOptions {

@@ -11,7 +11,7 @@ class RNEncryptor : public RNCryptor {
 	string generateSalt();
 
 	public:
-		string encrypt(string plaintext, string password, RNCryptorSchema schemaVersion = SCHEMA_2);
+		string encrypt(string plaintext, string password, RNCryptorSchema schemaVersion = SCHEMA_3);
 };
 
 #endif

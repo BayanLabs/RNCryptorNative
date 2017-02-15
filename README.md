@@ -5,46 +5,15 @@
 Android JNI model implementation of Rob Napier's RNCryptor.
 
 
-#### Import guide
-
-```gradle
-dependencies {
-    compile 'com.github.tgio:rncryptor-native:0.0.8'
-}
-```
-
 #### Usage
 
   ```java
   
 RNCryptorNative rncryptor = new RNCryptorNative();
 
-String encrypted = new String(rncryptor.encrypt(raw, password));
+byte[] encrypted = rncryptor.encrypt(raw, password);
 
-String decrypted = rncryptor.decrypt(encrypted, password)
-
-  ```
-  
-  or
-
-  ```java
-  
-String password = "StrongGeneratedPasswordxD";
-  
-RNCryptorNative.encryptAsync("test", password, new RNCryptorNative.Callback() {
-    @Override
-    public void done(String encrypted, Exception e) {
-        System.out.println("encrypted async: " + encrypted);
-    }
-});
-
-//Decrypt
-RNCryptorNative.decryptAsync(encrypted, password, new RNCryptorNative.Callback() {
-    @Override
-    public void done(String decrypted, Exception e) {
-        System.out.println("decrypted async: " + decrypted);
-    }
-});
+byte[] decrypted = rncryptor.decrypt(encrypted, password)
 
 //Working with files
 
